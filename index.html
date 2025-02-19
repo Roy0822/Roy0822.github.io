@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Profile</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #1a1a1a;
+            font-family: 'Press Start 2P', cursive;
+            overflow-x: hidden;
+        }
+
+        /* 像素背景动画 */
+        .pixel-bg {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+        }
+
+        .pixel {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.1);
+            animation: float 6s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0); }
+            100% { transform: translateY(-100vh) translateX(20vw); }
+        }
+
+        /* 个人资料卡片 */
+        .profile-card {
+            position: relative;
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #2d2d2d;
+            border: 4px solid #6c5ce7;
+            box-shadow: 8px 8px 0 #000;
+        }
+
+        .pixel-avatar {
+            width: 120px;
+            height: 120px;
+            border: 4px solid #6c5ce7;
+            image-rendering: pixelated;
+            margin: 0 auto 20px;
+            display: block;
+        }
+
+        h1 {
+            color: #6c5ce7;
+            text-align: center;
+            font-size: 24px;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        .bio {
+            color: #fff;
+            font-size: 12px;
+            line-height: 1.5;
+            margin: 20px 0;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .social-link {
+            width: 32px;
+            height: 32px;
+            background-color: #6c5ce7;
+            display: block;
+            transition: transform 0.2s;
+        }
+
+        .social-link:hover {
+            transform: translateY(-2px);
+        }
+
+        /* 动态像素云 */
+        .cloud {
+            position: absolute;
+            animation: cloudMove 20s linear infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes cloudMove {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100vw); }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 动态背景 -->
+    <div class="pixel-bg">
+        <!-- 自动生成像素点 -->
+        <script>
+            for(let i = 0; i < 100; i++) {
+                const pixel = document.createElement('div');
+                pixel.className = 'pixel';
+                pixel.style.left = Math.random() * 100 + 'vw';
+                pixel.style.animationDelay = Math.random() * 5 + 's';
+                document.querySelector('.pixel-bg').appendChild(pixel);
+            }
+        </script>
+    </div>
+
+    <!-- 像素云 -->
+    <div class="cloud" style="top: 20%; left: -50px; width: 100px; height: 40px; background: repeating-linear-gradient(
+        45deg,
+        #6c5ce7,
+        #6c5ce7 5px,
+        #4b3b8a 5px,
+        #4b3b8a 10px
+    );"></div>
+
+    <!-- 个人资料卡片 -->
+    <div class="profile-card">
+        <img src="your-avatar.png" alt="Avatar" class="pixel-avatar">
+        <h1>YOUR NAME</h1>
+        <p class="bio">Pixel enthusiast<br>
+        Retro game lover<br>
+        Full-time developer<br>
+        Part-time wizard</p>
+        <div class="social-links">
+            <a href="#" class="social-link"></a>
+            <a href="#" class="social-link"></a>
+            <a href="#" class="social-link"></a>
+        </div>
+    </div>
+
+    <!-- 更多动态元素 -->
+    <script>
+        // 生成动态云朵
+        function createCloud() {
+            const cloud = document.createElement('div');
+            cloud.className = 'cloud';
+            cloud.style.top = Math.random() * 80 + '%';
+            cloud.style.width = Math.random() * 100 + 50 + 'px';
+            cloud.style.height = Math.random() * 30 + 20 + 'px';
+            cloud.style.background = `repeating-linear-gradient(
+                45deg,
+                #6c5ce7,
+                #6c5ce7 ${Math.random()*4 + 2}px,
+                #4b3b8a ${Math.random()*4 + 2}px,
+                #4b3b8a ${Math.random()*4 + 6}px
+            )`;
+            document.body.appendChild(cloud);
+        }
+
+        // 创建3朵云
+        for(let i = 0; i < 3; i++) {
+            createCloud();
+        }
+    </script>
+</body>
+</html>
