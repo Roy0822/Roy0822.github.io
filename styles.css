@@ -1,0 +1,256 @@
+:root {
+  --bg-top: #f8f5eb;
+  --bg-mid: #efe7d0;
+  --ink: #212126;
+  --ink-soft: #45454f;
+  --panel: #fff9ea;
+  --panel-line: #262733;
+  --accent: #d97830;
+  --accent-2: #2f6f63;
+  --wood: #c99562;
+  --wood-dark: #8f5f3a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Space Grotesk", sans-serif;
+  background:
+    radial-gradient(circle at 10% 10%, #fff6df 0 28%, transparent 28%),
+    radial-gradient(circle at 95% 3%, #f4e6c5 0 14%, transparent 15%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid));
+  color: var(--ink);
+}
+
+body {
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.topbar {
+  max-width: 1200px;
+  margin: 0 auto 1rem;
+  border: 3px solid var(--panel-line);
+  background: #fff9ec;
+  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.12);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.pixel-dot {
+  width: 14px;
+  height: 14px;
+  background: var(--accent);
+  border: 2px solid var(--panel-line);
+  box-shadow:
+    16px 0 0 #f0c04f,
+    32px 0 0 #4978ba;
+}
+
+.brand-title {
+  font-family: "VT323", monospace;
+  font-size: 1.6rem;
+  letter-spacing: 0.05rem;
+}
+
+.menu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.menu a {
+  text-decoration: none;
+  color: var(--ink);
+  border: 2px solid var(--panel-line);
+  padding: 0.25rem 0.65rem;
+  font-family: "VT323", monospace;
+  font-size: 1.3rem;
+  background: #ffefc7;
+}
+
+.menu a:hover,
+.menu a:focus-visible {
+  background: #f7c981;
+}
+
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.hero-copy,
+.hero-card {
+  border: 3px solid var(--panel-line);
+  background: rgba(255, 252, 244, 0.95);
+  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.08);
+  padding: 1rem;
+}
+
+.kicker {
+  margin: 0;
+  font-family: "VT323", monospace;
+  font-size: 1.5rem;
+  color: var(--accent-2);
+}
+
+.hero h1 {
+  margin: 0.25rem 0 0.5rem;
+  line-height: 1;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+}
+
+.hero p {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+.hero-card {
+  display: grid;
+  align-content: center;
+  gap: 0.2rem;
+}
+
+.hero-card p {
+  margin: 0;
+  font-family: "VT323", monospace;
+  font-size: 1.5rem;
+  color: var(--accent);
+}
+
+.hero-card strong {
+  font-size: 1rem;
+}
+
+.scene-wrap {
+  position: relative;
+  border: 4px solid var(--panel-line);
+  box-shadow: 0 10px 0 rgba(0, 0, 0, 0.16);
+  overflow: hidden;
+  background: #d8f2ff;
+}
+
+#pixelScene {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.tooltip {
+  position: absolute;
+  min-width: 200px;
+  max-width: 260px;
+  padding: 0.5rem 0.65rem;
+  border: 2px solid var(--panel-line);
+  background: #fff;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.25);
+  font-size: 0.86rem;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 100ms ease, transform 120ms ease;
+}
+
+.tooltip.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tooltip b {
+  display: block;
+  font-family: "VT323", monospace;
+  font-size: 1.35rem;
+  margin-bottom: 0.1rem;
+}
+
+.sections-grid {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.panel {
+  border: 3px solid var(--panel-line);
+  background: var(--panel);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.12);
+  padding: 0.85rem;
+}
+
+.panel h2 {
+  margin: 0;
+  font-family: "VT323", monospace;
+  font-size: 1.65rem;
+}
+
+.panel p {
+  margin: 0.35rem 0 0;
+  color: var(--ink-soft);
+  line-height: 1.45;
+}
+
+footer {
+  max-width: 1200px;
+  margin: 0.85rem auto 0;
+  text-align: center;
+  font-family: "VT323", monospace;
+  font-size: 1.3rem;
+  color: #4a4a55;
+}
+
+@media (max-width: 960px) {
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .sections-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  body {
+    padding: 0.5rem;
+  }
+
+  .menu a {
+    font-size: 1.15rem;
+  }
+
+  .sections-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tooltip {
+    max-width: 220px;
+    font-size: 0.8rem;
+  }
+}
