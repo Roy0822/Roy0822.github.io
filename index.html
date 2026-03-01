@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header class="topbar">
+    <header class="topbar reveal-item">
       <div class="brand">
         <span class="pixel-dot"></span>
         <span class="brand-title">ROY0822 / PIXEL LAB</span>
@@ -33,7 +33,7 @@
 
     <main>
       <section class="hero">
-        <div class="hero-copy">
+        <div class="hero-copy reveal-item">
           <p class="kicker">Academic Personal Website</p>
           <h1>Interactive Pixel Workspace</h1>
           <p>
@@ -41,47 +41,52 @@
             academic profile.
           </p>
         </div>
-        <div class="hero-card">
+        <div class="hero-card reveal-item">
           <p>Live Scene</p>
           <strong>Hover a bot to open quick description</strong>
         </div>
       </section>
 
       <section class="scene-wrap" aria-label="Interactive pixel scene">
+        <div class="scene-fx" aria-hidden="true">
+          <span class="fx-orb orb-1"></span>
+          <span class="fx-orb orb-2"></span>
+          <span class="fx-orb orb-3"></span>
+        </div>
         <canvas id="pixelScene" width="1200" height="680"></canvas>
         <div id="botTooltip" class="tooltip" role="status" aria-live="polite"></div>
       </section>
 
       <section class="sections-grid">
-        <article id="about" class="panel">
+        <article id="about" class="panel reveal-item">
           <h2>About</h2>
           <p>
             I am Roy, focusing on AI systems, autonomous agents, and human-AI
             collaboration.
           </p>
         </article>
-        <article id="education" class="panel">
+        <article id="education" class="panel reveal-item">
           <h2>Education</h2>
           <p>
             M.S. in Computer Science. Research interest in multi-agent systems,
             LLM workflows, and software intelligence.
           </p>
         </article>
-        <article id="publications" class="panel">
+        <article id="publications" class="panel reveal-item">
           <h2>Publications</h2>
           <p>
             Working papers on agent-driven software development and interactive
             programming interfaces.
           </p>
         </article>
-        <article id="projects" class="panel">
+        <article id="projects" class="panel reveal-item">
           <h2>Projects</h2>
           <p>
             Chat-like dev environments, AI coding assistants, and educational
             open-source tools.
           </p>
         </article>
-        <article id="contact" class="panel">
+        <article id="contact" class="panel reveal-item">
           <h2>Contact</h2>
           <p>
             Email: roy@example.com<br />
@@ -95,6 +100,7 @@
       <small>© <span id="year"></span> Roy0822. Built for GitHub Pages.</small>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

@@ -151,7 +151,47 @@ main {
   background: #d8f2ff;
 }
 
+.scene-fx {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.fx-orb {
+  position: absolute;
+  border-radius: 999px;
+  opacity: 0.42;
+  filter: blur(1px);
+}
+
+.orb-1 {
+  width: 220px;
+  height: 220px;
+  left: 6%;
+  top: -8%;
+  background: radial-gradient(circle at 30% 30%, #fff8b6, #f7a34f 65%, transparent 72%);
+}
+
+.orb-2 {
+  width: 300px;
+  height: 300px;
+  right: -5%;
+  top: 18%;
+  background: radial-gradient(circle at 40% 35%, #d9fdff, #6cb5ef 65%, transparent 73%);
+}
+
+.orb-3 {
+  width: 210px;
+  height: 210px;
+  left: 44%;
+  bottom: -12%;
+  background: radial-gradient(circle at 45% 35%, #ffd9dc, #dc747c 65%, transparent 74%);
+}
+
 #pixelScene {
+  position: relative;
+  z-index: 2;
   display: block;
   width: 100%;
   height: auto;
@@ -198,6 +238,11 @@ main {
   background: var(--panel);
   box-shadow: 0 6px 0 rgba(0, 0, 0, 0.12);
   padding: 0.85rem;
+}
+
+.reveal-item {
+  opacity: 0;
+  transform: translateY(18px);
 }
 
 .panel h2 {

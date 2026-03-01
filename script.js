@@ -211,6 +211,18 @@ canvas.addEventListener("mousemove", (e) => {
   mouse.x = e.clientX - rect.left;
   mouse.y = e.clientY - rect.top;
   mouse.inside = true;
+
+  if (window.anime) {
+    const nx = (mouse.x / rect.width - 0.5) * 6;
+    const ny = (mouse.y / rect.height - 0.5) * 4;
+    anime({
+      targets: "#pixelScene",
+      translateX: nx,
+      translateY: ny,
+      duration: 250,
+      easing: "easeOutQuad",
+    });
+  }
 });
 
 canvas.addEventListener("mouseleave", () => {
@@ -218,6 +230,16 @@ canvas.addEventListener("mouseleave", () => {
   activeBot = null;
   canvas.style.cursor = "default";
   tooltip.classList.remove("visible");
+
+  if (window.anime) {
+    anime({
+      targets: "#pixelScene",
+      translateX: 0,
+      translateY: 0,
+      duration: 420,
+      easing: "easeOutElastic(1, .7)",
+    });
+  }
 });
 
 canvas.addEventListener("click", () => {
@@ -236,5 +258,40 @@ document.querySelectorAll(".menu a").forEach((link) => {
 });
 
 document.getElementById("year").textContent = new Date().getFullYear();
+
+if (window.anime) {
+  anime({
+    targets: ".reveal-item",
+    opacity: [0, 1],
+    translateY: [18, 0],
+    delay: anime.stagger(90),
+    duration: 820,
+    easing: "easeOutCubic",
+  });
+
+  anime({
+    targets: ".fx-orb",
+    translateY: [0, -24],
+    translateX: () => anime.random(-8, 8),
+    opacity: [0.28, 0.55],
+    duration: () => anime.random(2400, 4200),
+    direction: "alternate",
+    loop: true,
+    easing: "easeInOutSine",
+    delay: anime.stagger(260),
+  });
+
+  anime({
+    targets: ".scene-wrap",
+    boxShadow: [
+      "0 10px 0 rgba(0,0,0,0.16)",
+      "0 14px 0 rgba(0,0,0,0.2)",
+      "0 10px 0 rgba(0,0,0,0.16)",
+    ],
+    duration: 3800,
+    easing: "easeInOutSine",
+    loop: true,
+  });
+}
 
 requestAnimationFrame(loop);
