@@ -1,297 +1,336 @@
-const canvas = document.getElementById("pixelScene");
-const ctx = canvas.getContext("2d");
-const tooltip = document.getElementById("botTooltip");
-const dpr = window.devicePixelRatio || 1;
+const stage = document.getElementById("stage");
+const fogCanvas = document.getElementById("fogCanvas");
+const tooltip = document.getElementById("nodeTooltip");
+const nodes = Array.from(document.querySelectorAll(".orbit-node"));
+const menuLinks = Array.from(document.querySelectorAll(".menu a"));
+const revealEls = Array.from(document.querySelectorAll(".reveal"));
 
-const WORLD_W = 1200;
-const WORLD_H = 680;
+const pointer = {
+  currentX: 0,
+  currentY: 0,
+  targetX: 0,
+  targetY: 0,
+};
 
-const sections = [
-  {
-    key: "about",
-    title: "About",
-    desc: "Researching AI agents, software intelligence, and human-AI collaboration.",
-    color: "#da7b42",
-  },
-  {
-    key: "education",
-    title: "Education",
-    desc: "M.S. in CS, focus on multi-agent systems and practical machine intelligence.",
-    color: "#4f7fcb",
-  },
-  {
-    key: "publications",
-    title: "Publications",
-    desc: "Papers and preprints on agent workflows and interactive development systems.",
-    color: "#4f9f6d",
-  },
-  {
-    key: "projects",
-    title: "Projects",
-    desc: "Building coding copilots, AI interfaces, and open-source research tools.",
-    color: "#b267d7",
-  },
-  {
-    key: "contact",
-    title: "Contact",
-    desc: "Find me on GitHub and by email for collaboration and academic opportunities.",
-    color: "#dd6067",
-  },
-];
+const sceneTone = {
+  value: 0,
+  target: 0,
+};
 
-const signs = [
-  { x: 120, y: 200, text: "ABOUT" },
-  { x: 380, y: 200, text: "EDU" },
-  { x: 640, y: 200, text: "PAPERS" },
-  { x: 920, y: 200, text: "PROJECTS" },
-  { x: 1040, y: 520, text: "CONTACT" },
-];
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const bots = sections.map((section, idx) => {
-  const laneY = [260, 340, 430, 520, 600][idx];
-  return {
-    id: section.key,
-    section,
-    x: 120 + idx * 180,
-    y: laneY,
-    vx: (Math.random() > 0.5 ? 1 : -1) * (0.5 + Math.random() * 0.6),
-    phase: Math.random() * Math.PI * 2,
-    width: 22,
-    height: 30,
-    hover: false,
-  };
-});
-
-const mouse = { x: -999, y: -999, inside: false };
-let activeBot = null;
-
-function fitCanvas() {
-  const rect = canvas.getBoundingClientRect();
-  canvas.width = Math.round(rect.width * dpr);
-  canvas.height = Math.round((rect.width * (WORLD_H / WORLD_W)) * dpr);
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
 }
 
-function drawRect(x, y, w, h, c) {
-  ctx.fillStyle = c;
-  ctx.fillRect(Math.floor(x), Math.floor(y), Math.floor(w), Math.floor(h));
+function updatePerspectiveTargets(clientX, clientY) {
+  const rect = stage.getBoundingClientRect();
+  const nx = (clientX - rect.left) / rect.width;
+  const ny = (clientY - rect.top) / rect.height;
+
+  pointer.targetX = clamp((nx - 0.5) * 2, -1, 1);
+  pointer.targetY = clamp((ny - 0.5) * 2, -1, 1);
 }
 
-function drawSceneBackground() {
-  const scale = canvas.clientWidth / WORLD_W;
-  const h = WORLD_H * scale;
-  const w = WORLD_W * scale;
-
-  const sky = ctx.createLinearGradient(0, 0, 0, h * 0.45);
-  sky.addColorStop(0, "#f9f3df");
-  sky.addColorStop(1, "#ddf3ff");
-  ctx.fillStyle = sky;
-  ctx.fillRect(0, 0, w, h);
-
-  drawRect(0, h * 0.45, w, h * 0.06, "#8cb8e9");
-  drawRect(0, h * 0.51, w, h * 0.49, "#cf9962");
-
-  for (let i = 0; i < 8; i += 1) {
-    drawRect(i * (w / 8), h * 0.53, 2, h * 0.47, "#bb8553");
-  }
-
-  drawRect(w * 0.44, h * 0.44, w * 0.12, h * 0.09, "#7d5a3e");
-  drawRect(w * 0.445, h * 0.445, w * 0.11, h * 0.01, "#5f4530");
-  drawRect(w * 0.445, h * 0.47, w * 0.11, h * 0.01, "#5f4530");
-
-  signs.forEach((sign) => {
-    const sx = sign.x * scale;
-    const sy = sign.y * scale;
-    drawRect(sx, sy, 70 * scale, 24 * scale, "#704734");
-    drawRect(sx + 6 * scale, sy + 4 * scale, 58 * scale, 16 * scale, "#40271d");
-    drawRect(sx + 30 * scale, sy + 24 * scale, 10 * scale, 40 * scale, "#704734");
-
-    ctx.fillStyle = "#f8efd1";
-    ctx.font = `${11 * scale}px VT323`;
-    ctx.textAlign = "center";
-    ctx.fillText(sign.text, sx + 35 * scale, sy + 16 * scale);
-  });
+function setNeutralPerspective() {
+  pointer.targetX = 0;
+  pointer.targetY = 0;
 }
 
-function drawBot(bot, scale, time) {
-  const bob = Math.sin(time * 0.005 + bot.phase) * 1.5;
-  const x = bot.x * scale;
-  const y = (bot.y + bob) * scale;
-  const dir = bot.vx >= 0 ? 1 : -1;
-  const main = bot.section.color;
-
-  drawRect(x + 7 * scale, y + 2 * scale, 10 * scale, 8 * scale, "#2d2d35");
-  drawRect(x + 8 * scale, y + 3 * scale, 8 * scale, 6 * scale, "#f0d8b8");
-  drawRect(x + 5 * scale, y + 10 * scale, 16 * scale, 10 * scale, main);
-  drawRect(x + 7 * scale, y + 20 * scale, 4 * scale, 8 * scale, "#38406b");
-  drawRect(x + 13 * scale, y + 20 * scale, 4 * scale, 8 * scale, "#38406b");
-  drawRect(x + 5 * scale, y + 11 * scale, 2 * scale, 5 * scale, "#f0d8b8");
-  drawRect(x + 19 * scale, y + 11 * scale, 2 * scale, 5 * scale, "#f0d8b8");
-
-  drawRect(x + (dir > 0 ? 14 : 8) * scale, y + 5 * scale, 2 * scale, 2 * scale, "#222");
-
-  if (bot.hover) {
-    const bubbleX = x - 30 * scale;
-    const bubbleY = y - 28 * scale;
-    drawRect(bubbleX, bubbleY, 82 * scale, 20 * scale, "#fffaf0");
-    drawRect(bubbleX, bubbleY, 82 * scale, 2 * scale, "#2b2b34");
-    drawRect(bubbleX, bubbleY + 18 * scale, 82 * scale, 2 * scale, "#2b2b34");
-    drawRect(bubbleX, bubbleY, 2 * scale, 20 * scale, "#2b2b34");
-    drawRect(bubbleX + 80 * scale, bubbleY, 2 * scale, 20 * scale, "#2b2b34");
-    ctx.fillStyle = "#2b2b34";
-    ctx.font = `${10 * scale}px VT323`;
-    ctx.fillText(bot.section.title.toUpperCase(), bubbleX + 41 * scale, bubbleY + 13 * scale);
-  }
+function syncSceneByScroll() {
+  const doc = document.documentElement;
+  const maxScroll = Math.max(1, doc.scrollHeight - window.innerHeight);
+  const progress = clamp(window.scrollY / maxScroll, 0, 1);
+  sceneTone.target = progress;
 }
 
-function updateBots() {
-  bots.forEach((bot) => {
-    bot.x += bot.vx;
-    const left = 20;
-    const right = WORLD_W - 40;
-    if (bot.x < left || bot.x > right) {
-      bot.vx *= -1;
-      bot.x = Math.max(left, Math.min(right, bot.x));
-    }
+function animatePerspective() {
+  pointer.currentX += (pointer.targetX - pointer.currentX) * 0.08;
+  pointer.currentY += (pointer.targetY - pointer.currentY) * 0.08;
 
-    if (Math.random() < 0.004) {
-      bot.vx *= -1;
-    }
-  });
+  sceneTone.value += (sceneTone.target - sceneTone.value) * 0.06;
+
+  const tiltBoost = sceneTone.value * 3.2;
+  const rx = pointer.currentY * -7 - tiltBoost;
+  const ry = pointer.currentX * 9;
+
+  stage.style.setProperty("--rx", `${rx.toFixed(3)}deg`);
+  stage.style.setProperty("--ry", `${ry.toFixed(3)}deg`);
+  stage.style.setProperty("--mx", pointer.currentX.toFixed(4));
+  stage.style.setProperty("--my", pointer.currentY.toFixed(4));
+  stage.style.setProperty("--scene-shift", sceneTone.value.toFixed(4));
 }
 
-function updateHover(scale) {
-  let nearest = null;
-  let nearestDist = Number.POSITIVE_INFINITY;
+function showTooltip(node) {
+  const rect = stage.getBoundingClientRect();
+  const nodeRect = node.getBoundingClientRect();
 
-  bots.forEach((bot) => {
-    const bx = bot.x * scale + (bot.width * scale) / 2;
-    const by = bot.y * scale + (bot.height * scale) / 2;
-    const dx = mouse.x - bx;
-    const dy = mouse.y - by;
-    const dist = Math.hypot(dx, dy);
-    bot.hover = false;
+  const title = node.dataset.title || "";
+  const desc = node.dataset.desc || "";
+  tooltip.innerHTML = `<strong>${title}</strong>${desc}`;
 
-    if (dist < 40 * scale && dist < nearestDist) {
-      nearest = bot;
-      nearestDist = dist;
-    }
-  });
+  const left = clamp(nodeRect.left - rect.left + nodeRect.width / 2 + 14, 12, rect.width - 220);
+  const top = clamp(nodeRect.top - rect.top - 68, 12, rect.height - 90);
 
-  if (mouse.inside && nearest) {
-    activeBot = nearest;
-    nearest.hover = true;
-    canvas.style.cursor = "pointer";
-    tooltip.classList.add("visible");
-    tooltip.innerHTML = `<b>${nearest.section.title}</b>${nearest.section.desc}`;
-
-    const tipX = Math.min(mouse.x + 16, canvas.clientWidth - 240);
-    const tipY = Math.max(mouse.y - 72, 12);
-    tooltip.style.left = `${tipX}px`;
-    tooltip.style.top = `${tipY}px`;
-  } else {
-    activeBot = null;
-    canvas.style.cursor = "default";
-    tooltip.classList.remove("visible");
-  }
+  tooltip.style.left = `${left}px`;
+  tooltip.style.top = `${top}px`;
+  tooltip.classList.add("visible");
 }
 
-function loop(time) {
-  fitCanvas();
-  const scale = canvas.clientWidth / WORLD_W;
-  drawSceneBackground();
-  updateBots();
-  updateHover(scale);
-  bots.forEach((bot) => drawBot(bot, scale, time));
-  requestAnimationFrame(loop);
-}
-
-canvas.addEventListener("mousemove", (e) => {
-  const rect = canvas.getBoundingClientRect();
-  mouse.x = e.clientX - rect.left;
-  mouse.y = e.clientY - rect.top;
-  mouse.inside = true;
-
-  if (window.anime) {
-    const nx = (mouse.x / rect.width - 0.5) * 6;
-    const ny = (mouse.y / rect.height - 0.5) * 4;
-    anime({
-      targets: "#pixelScene",
-      translateX: nx,
-      translateY: ny,
-      duration: 250,
-      easing: "easeOutQuad",
-    });
-  }
-});
-
-canvas.addEventListener("mouseleave", () => {
-  mouse.inside = false;
-  activeBot = null;
-  canvas.style.cursor = "default";
+function hideTooltip() {
   tooltip.classList.remove("visible");
+}
 
-  if (window.anime) {
-    anime({
-      targets: "#pixelScene",
-      translateX: 0,
-      translateY: 0,
-      duration: 420,
-      easing: "easeOutElastic(1, .7)",
+function bindNodeInteractions() {
+  nodes.forEach((node) => {
+    node.addEventListener("mouseenter", () => {
+      showTooltip(node);
     });
-  }
-});
 
-canvas.addEventListener("click", () => {
-  if (!activeBot) return;
-  const section = document.getElementById(activeBot.id);
-  section?.scrollIntoView({ behavior: "smooth", block: "start" });
-});
+    node.addEventListener("mousemove", (e) => {
+      updatePerspectiveTargets(e.clientX, e.clientY);
+      showTooltip(node);
+    });
 
-document.querySelectorAll(".menu a").forEach((link) => {
-  link.addEventListener("click", (e) => {
-    e.preventDefault();
-    const targetId = link.getAttribute("href");
-    const target = document.querySelector(targetId);
-    target?.scrollIntoView({ behavior: "smooth", block: "start" });
-  });
-});
+    node.addEventListener("mouseleave", () => {
+      hideTooltip();
+    });
 
-document.getElementById("year").textContent = new Date().getFullYear();
+    node.addEventListener("focus", () => {
+      showTooltip(node);
+    });
 
-if (window.anime) {
-  anime({
-    targets: ".reveal-item",
-    opacity: [0, 1],
-    translateY: [18, 0],
-    delay: anime.stagger(90),
-    duration: 820,
-    easing: "easeOutCubic",
-  });
+    node.addEventListener("blur", () => {
+      hideTooltip();
+    });
 
-  anime({
-    targets: ".fx-orb",
-    translateY: [0, -24],
-    translateX: () => anime.random(-8, 8),
-    opacity: [0.28, 0.55],
-    duration: () => anime.random(2400, 4200),
-    direction: "alternate",
-    loop: true,
-    easing: "easeInOutSine",
-    delay: anime.stagger(260),
-  });
-
-  anime({
-    targets: ".scene-wrap",
-    boxShadow: [
-      "0 10px 0 rgba(0,0,0,0.16)",
-      "0 14px 0 rgba(0,0,0,0.2)",
-      "0 10px 0 rgba(0,0,0,0.16)",
-    ],
-    duration: 3800,
-    easing: "easeInOutSine",
-    loop: true,
+    node.addEventListener("click", () => {
+      const targetId = node.dataset.target;
+      if (!targetId) return;
+      const section = document.getElementById(targetId);
+      section?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   });
 }
 
-requestAnimationFrame(loop);
+function bindStageInteractions() {
+  stage.addEventListener("mousemove", (e) => {
+    updatePerspectiveTargets(e.clientX, e.clientY);
+  });
+
+  stage.addEventListener("mouseleave", () => {
+    setNeutralPerspective();
+    hideTooltip();
+  });
+
+  stage.addEventListener(
+    "touchmove",
+    (e) => {
+      if (!e.touches[0]) return;
+      const t = e.touches[0];
+      updatePerspectiveTargets(t.clientX, t.clientY);
+    },
+    { passive: true },
+  );
+
+  stage.addEventListener("touchend", () => {
+    setNeutralPerspective();
+    hideTooltip();
+  });
+}
+
+function bindMenuSmoothScroll() {
+  menuLinks.forEach((link) => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const targetId = link.getAttribute("href");
+      if (!targetId) return;
+      document.querySelector(targetId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+}
+
+function initRevealObserver() {
+  if (!("IntersectionObserver" in window)) {
+    revealEls.forEach((el) => el.classList.add("visible"));
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    {
+      threshold: 0.15,
+      rootMargin: "0px 0px -10% 0px",
+    },
+  );
+
+  revealEls.forEach((el) => observer.observe(el));
+}
+
+function initScrollLinking() {
+  syncSceneByScroll();
+  window.addEventListener("scroll", syncSceneByScroll, { passive: true });
+}
+
+function initWebGLFog() {
+  if (!window.THREE || reduceMotion) return null;
+
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({
+      canvas: fogCanvas,
+      antialias: true,
+      alpha: true,
+    });
+  } catch (_err) {
+    return null;
+  }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.8));
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 160);
+  camera.position.set(0, 0, 20);
+
+  const particleCount = 900;
+  const positions = new Float32Array(particleCount * 3);
+  const scales = new Float32Array(particleCount);
+
+  for (let i = 0; i < particleCount; i += 1) {
+    const ix = i * 3;
+    positions[ix] = (Math.random() - 0.5) * 42;
+    positions[ix + 1] = (Math.random() - 0.5) * 24;
+    positions[ix + 2] = (Math.random() - 0.5) * 28;
+    scales[i] = 0.35 + Math.random() * 1.8;
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute("aScale", new THREE.BufferAttribute(scales, 1));
+
+  const material = new THREE.ShaderMaterial({
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    uniforms: {
+      uTime: { value: 0 },
+      uTone: { value: 0 },
+      uBaseA: { value: new THREE.Color("#7bd3ff") },
+      uBaseB: { value: new THREE.Color("#cde7ff") },
+      uDeepA: { value: new THREE.Color("#6f9eff") },
+      uDeepB: { value: new THREE.Color("#9ff9ff") },
+    },
+    vertexShader: `
+      attribute float aScale;
+      uniform float uTime;
+      uniform float uTone;
+      varying float vMix;
+      void main() {
+        vec3 p = position;
+        p.y += sin(uTime * 0.45 + p.x * 0.22) * (0.28 + uTone * 0.4);
+        p.x += cos(uTime * 0.32 + p.y * 0.24) * 0.2;
+        vec4 mvPosition = modelViewMatrix * vec4(p, 1.0);
+        gl_Position = projectionMatrix * mvPosition;
+        gl_PointSize = aScale * (7.0 + uTone * 4.0) * (35.0 / -mvPosition.z);
+        vMix = clamp((p.y + 12.0) / 24.0, 0.0, 1.0);
+      }
+    `,
+    fragmentShader: `
+      uniform float uTone;
+      uniform vec3 uBaseA;
+      uniform vec3 uBaseB;
+      uniform vec3 uDeepA;
+      uniform vec3 uDeepB;
+      varying float vMix;
+      void main() {
+        vec2 uv = gl_PointCoord - 0.5;
+        float d = length(uv);
+        float alpha = smoothstep(0.52, 0.05, d) * (0.24 + uTone * 0.28);
+        vec3 c0 = mix(uBaseA, uBaseB, vMix);
+        vec3 c1 = mix(uDeepA, uDeepB, vMix);
+        vec3 color = mix(c0, c1, uTone);
+        gl_FragColor = vec4(color, alpha);
+      }
+    `,
+  });
+
+  const points = new THREE.Points(geometry, material);
+  scene.add(points);
+
+  function resize() {
+    const rect = stage.getBoundingClientRect();
+    const width = Math.max(1, Math.floor(rect.width));
+    const height = Math.max(1, Math.floor(rect.height));
+    renderer.setSize(width, height, false);
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+  }
+
+  const handleResize = () => resize();
+  let ro = null;
+  if ("ResizeObserver" in window) {
+    ro = new ResizeObserver(handleResize);
+    ro.observe(stage);
+  } else {
+    window.addEventListener("resize", handleResize);
+  }
+  resize();
+
+  return {
+    scene,
+    material,
+    points,
+    camera,
+    renderer,
+    destroy() {
+      if (ro) {
+        ro.disconnect();
+      } else {
+        window.removeEventListener("resize", handleResize);
+      }
+      geometry.dispose();
+      material.dispose();
+      renderer.dispose();
+    },
+  };
+}
+
+function init() {
+  bindNodeInteractions();
+  bindStageInteractions();
+  bindMenuSmoothScroll();
+  initRevealObserver();
+  initScrollLinking();
+
+  const webgl = initWebGLFog();
+
+  let last = performance.now();
+  function tick(now) {
+    const dt = (now - last) / 1000;
+    last = now;
+
+    animatePerspective();
+
+    if (webgl) {
+      webgl.material.uniforms.uTime.value += dt;
+      webgl.material.uniforms.uTone.value = sceneTone.value;
+      webgl.points.rotation.y += dt * (0.035 + sceneTone.value * 0.08);
+      webgl.points.rotation.x = Math.sin(webgl.material.uniforms.uTime.value * 0.18) * 0.08;
+      webgl.camera.position.z = 20 - sceneTone.value * 2.6;
+      webgl.renderer.render(webgl.scene, webgl.camera);
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+  requestAnimationFrame(tick);
+}
+
+init();

@@ -3,25 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Roy | Academic Pixel Lab</title>
+    <title>Roy | Immersive Academic Portfolio</title>
     <meta
       name="description"
-      content="Roy's personal academic homepage with an interactive pixel-bot scene."
+      content="Interactive academic portfolio with cinematic depth and perspective effects."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=VT323&family=Space+Grotesk:wght@400;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Cormorant+Garamond:wght@500;600&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header class="topbar reveal-item">
-      <div class="brand">
-        <span class="pixel-dot"></span>
-        <span class="brand-title">ROY0822 / PIXEL LAB</span>
-      </div>
+    <div class="page-bg" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <a class="brand" href="#home">Roy0822</a>
       <nav class="menu" aria-label="Main navigation">
         <a href="#about">About</a>
         <a href="#education">Education</a>
@@ -31,62 +30,78 @@
       </nav>
     </header>
 
-    <main>
+    <main id="home">
       <section class="hero">
-        <div class="hero-copy reveal-item">
-          <p class="kicker">Academic Personal Website</p>
-          <h1>Interactive Pixel Workspace</h1>
+        <div class="hero-copy reveal">
+          <p class="eyebrow">Immersive Personal Website</p>
+          <h1>Interactive Depth Scene</h1>
           <p>
-            Move your mouse over the walking bots to preview each section of my
-            academic profile.
+            Explore my work through a perspective-driven environment. Hover each node
+            to preview a section, then click to jump directly.
           </p>
         </div>
-        <div class="hero-card reveal-item">
-          <p>Live Scene</p>
-          <strong>Hover a bot to open quick description</strong>
+
+        <div class="stage-shell reveal">
+          <div class="stage" id="stage">
+            <canvas id="fogCanvas" class="fog-canvas" aria-hidden="true"></canvas>
+            <div class="stage-camera" id="stageCamera">
+              <div class="depth-layer sky" data-depth="4"></div>
+              <div class="depth-layer haze" data-depth="8"></div>
+              <div class="depth-layer terrain terrain-back" data-depth="14"></div>
+              <div class="depth-layer terrain terrain-mid" data-depth="20"></div>
+              <div class="depth-layer terrain terrain-front" data-depth="28"></div>
+
+              <div class="focus-card" data-depth="18">
+                <p>Roy's Research Space</p>
+                <strong>AI Agents · Software Intelligence · HCI</strong>
+              </div>
+
+              <button class="orbit-node n1" data-target="about" data-title="About" data-desc="Who I am, what I work on, and my research focus.">About</button>
+              <button class="orbit-node n2" data-target="education" data-title="Education" data-desc="Academic training and specialization areas.">Education</button>
+              <button class="orbit-node n3" data-target="publications" data-title="Publications" data-desc="Representative papers, preprints, and writing.">Publications</button>
+              <button class="orbit-node n4" data-target="projects" data-title="Projects" data-desc="Interactive systems, tooling, and engineering demos.">Projects</button>
+              <button class="orbit-node n5" data-target="contact" data-title="Contact" data-desc="How to collaborate, connect, or invite me for talks.">Contact</button>
+            </div>
+
+            <div id="nodeTooltip" class="node-tooltip" role="status" aria-live="polite"></div>
+          </div>
         </div>
       </section>
 
-      <section class="scene-wrap" aria-label="Interactive pixel scene">
-        <div class="scene-fx" aria-hidden="true">
-          <span class="fx-orb orb-1"></span>
-          <span class="fx-orb orb-2"></span>
-          <span class="fx-orb orb-3"></span>
-        </div>
-        <canvas id="pixelScene" width="1200" height="680"></canvas>
-        <div id="botTooltip" class="tooltip" role="status" aria-live="polite"></div>
-      </section>
-
-      <section class="sections-grid">
-        <article id="about" class="panel reveal-item">
+      <section class="content-grid" id="contentGrid">
+        <article id="about" class="panel reveal">
           <h2>About</h2>
           <p>
-            I am Roy, focusing on AI systems, autonomous agents, and human-AI
-            collaboration.
+            I build AI-native software systems with a focus on practical multi-agent
+            workflows, developer tools, and human-AI interaction design.
           </p>
         </article>
-        <article id="education" class="panel reveal-item">
+
+        <article id="education" class="panel reveal">
           <h2>Education</h2>
           <p>
-            M.S. in Computer Science. Research interest in multi-agent systems,
-            LLM workflows, and software intelligence.
+            M.S. in Computer Science. Core interests: autonomous systems, language
+            models, software engineering, and interactive intelligence.
           </p>
         </article>
-        <article id="publications" class="panel reveal-item">
+
+        <article id="publications" class="panel reveal">
           <h2>Publications</h2>
           <p>
-            Working papers on agent-driven software development and interactive
-            programming interfaces.
+            Selected publications and manuscripts in AI systems, agent collaboration,
+            and code-generation workflows.
           </p>
         </article>
-        <article id="projects" class="panel reveal-item">
+
+        <article id="projects" class="panel reveal">
           <h2>Projects</h2>
           <p>
-            Chat-like dev environments, AI coding assistants, and educational
-            open-source tools.
+            Portfolio includes AI coding assistants, web interaction experiments,
+            and open-source research prototypes.
           </p>
         </article>
-        <article id="contact" class="panel reveal-item">
+
+        <article id="contact" class="panel reveal">
           <h2>Contact</h2>
           <p>
             Email: roy@example.com<br />
@@ -97,10 +112,10 @@
     </main>
 
     <footer>
-      <small>© <span id="year"></span> Roy0822. Built for GitHub Pages.</small>
+      <small>© <span id="year"></span> Roy0822</small>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.min.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
