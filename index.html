@@ -1,121 +1,182 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Roy | Immersive Academic Portfolio</title>
-    <meta
-      name="description"
-      content="Interactive academic portfolio with cinematic depth and perspective effects."
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Cormorant+Garamond:wght@500;600&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <div class="page-bg" aria-hidden="true"></div>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Roy Tsai — Personal Website</title>
+<meta name="description" content="Roy Tsai — an undergraduate student at National Taiwan University exploring singing voice synthesis, generative music and audio editing, and cognitive science." />
 
-    <header class="topbar">
-      <a class="brand" href="#home">Roy0822</a>
-      <nav class="menu" aria-label="Main navigation">
-        <a href="#about">About</a>
-        <a href="#education">Education</a>
-        <a href="#publications">Publications</a>
-        <a href="#projects">Projects</a>
-        <a href="#contact">Contact</a>
-      </nav>
-    </header>
+<!-- Typography: classical serif for headings, clean sans for body -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
-    <main id="home">
-      <section class="hero">
-        <div class="hero-copy reveal">
-          <p class="eyebrow">Immersive Personal Website</p>
-          <h1>Interactive Depth Scene</h1>
-          <p>
-            Explore my work through a perspective-driven environment. Hover each node
-            to preview a section, then click to jump directly.
-          </p>
-        </div>
+<link rel="stylesheet" href="garden.css" />
+<noscript><style>#veil{display:none}.reveal{opacity:1;transform:none}</style></noscript>
+</head>
+<body>
 
-        <div class="stage-shell reveal">
-          <div class="stage" id="stage">
-            <canvas id="fogCanvas" class="fog-canvas" aria-hidden="true"></canvas>
-            <div class="stage-camera" id="stageCamera">
-              <div class="depth-layer sky" data-depth="4"></div>
-              <div class="depth-layer haze" data-depth="8"></div>
-              <div class="depth-layer terrain terrain-back" data-depth="14"></div>
-              <div class="depth-layer terrain terrain-mid" data-depth="20"></div>
-              <div class="depth-layer terrain terrain-front" data-depth="28"></div>
+<a class="skip-link" href="#main">Skip to content</a>
 
-              <div class="focus-card" data-depth="18">
-                <p>Roy's Research Space</p>
-                <strong>AI Agents · Software Intelligence · HCI</strong>
-              </div>
+<!-- loading veil — lifts once the garden is ready -->
+<div id="veil" role="presentation">
+  <div class="veil-title">Roy Tsai</div>
+  <div class="veil-bar"></div>
+  <div class="veil-sub">Entering the garden</div>
+</div>
 
-              <button class="orbit-node n1" data-target="about" data-title="About" data-desc="Who I am, what I work on, and my research focus.">About</button>
-              <button class="orbit-node n2" data-target="education" data-title="Education" data-desc="Academic training and specialization areas.">Education</button>
-              <button class="orbit-node n3" data-target="publications" data-title="Publications" data-desc="Representative papers, preprints, and writing.">Publications</button>
-              <button class="orbit-node n4" data-target="projects" data-title="Projects" data-desc="Interactive systems, tooling, and engineering demos.">Projects</button>
-              <button class="orbit-node n5" data-target="contact" data-title="Contact" data-desc="How to collaborate, connect, or invite me for talks.">Contact</button>
-            </div>
+<!-- ============================================================
+     3D GARDEN — decorative while reading, interactive in exploration
+     ============================================================ -->
+<canvas id="scene" aria-hidden="true"></canvas>
+<div class="garden-caption" aria-hidden="true"><span>HORTUS / 01</span><span>A space for curiosity.</span></div>
+<aside class="garden-tools" aria-label="Garden controls" hidden>
+  <div class="garden-toolbar">
+    <span class="garden-label"><span class="status-dot"></span> The living garden</span>
+    <button id="explore-toggle" aria-pressed="false" aria-controls="scene">Explore <span aria-hidden="true">⤢</span></button>
+    <button id="motion-toggle" aria-pressed="false" aria-label="Pause garden animation">Pause</button>
+  </div>
+  <div id="explore-controls" hidden>
+    <p id="camera-help">Drag to orbit · Scroll to zoom · Arrow keys to look</p>
+    <div class="camera-buttons">
+      <button data-view="overview">Overview</button><button data-view="statue">Sculpture</button><button data-view="parterre">Parterre</button>
+      <button id="camera-reset" aria-label="Reset camera">Reset ↺</button>
+    </div>
+    <p class="escape-hint">Esc to return to the portfolio</p>
+  </div>
+</aside>
+<p id="garden-status" class="sr-only" role="status"></p>
+<div id="vignette" aria-hidden="true"></div>
 
-            <div id="nodeTooltip" class="node-tooltip" role="status" aria-live="polite"></div>
+<!-- ============================================================
+     NAVIGATION
+     ============================================================ -->
+<header>
+  <nav class="nav" aria-label="Primary">
+    <a class="brand" href="#top">Roy Tsai</a>
+    <ul>
+      <li><a href="#about">About</a></li>
+      <li><a href="#publications">Publication</a></li>
+      <li><a href="#research">Research</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<!-- ============================================================
+     CONTENT — personal profile, interests and contact
+     ============================================================ -->
+<main id="main">
+<div id="content">
+
+  <!-- HERO -->
+  <section class="hero" id="top">
+    <div class="hero-panel reveal">
+      <p class="hero-kicker"><span class="status-dot"></span> A garden of ideas</p>
+      <h1>Roy Tsai<span class="name-period">.</span></h1>
+      <p class="role">Undergraduate Student · Department of Computer Science and Information Engineering · National Taiwan University</p>
+      <p class="focus">
+        I’m exploring singing voice synthesis, generative music and audio editing, and cognitive science.
+      </p>
+      <div class="hero-actions">
+        <a class="primary-link" href="#about">Discover my work <span aria-hidden="true">↗</span></a>
+        <button class="explore-link" data-explore hidden>Explore the garden <span aria-hidden="true">⤢</span></button>
+      </div>
+      <p class="scroll-hint">Scroll to wander</p>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="section" id="about">
+    <div class="panel reveal">
+      <p class="section-kicker">Section I</p>
+      <h2>About</h2>
+      <hr class="rule" />
+      <p>
+        I am an undergraduate student in the Department of Computer Science and Information Engineering at
+        National Taiwan University, where I am in the Music and AI Lab under supervision of Prof. Yang.
+      </p>
+      <p>
+        Outside the lab, I dance, sing, play a variety of instruments, and enjoy photography.
+      </p>
+    </div>
+  </section>
+
+  <!-- PUBLICATION -->
+  <section class="section" id="publications">
+    <div class="panel reveal">
+      <p class="section-kicker">Section II</p>
+      <h2>publication</h2>
+      <hr class="rule" />
+      <p lang="zh-Hant">努力生產中</p>
+    </div>
+  </section>
+
+  <!-- RESEARCH AREAS -->
+  <section class="section" id="research">
+    <div class="panel reveal">
+      <p class="section-kicker">Section III</p>
+      <h2>Research Areas</h2>
+      <hr class="rule" />
+      <div class="areas">
+        <div class="area">
+          <span class="glyph" aria-hidden="true">I</span>
+          <div>
+            <h3>Multilingual Singing Voice Synthesis</h3>
+            <p>Phonetic representations and cross-lingual learning for singing synthesis, with an emphasis on pronunciation modeling and low-resource languages.</p>
           </div>
         </div>
-      </section>
+        <div class="area">
+          <span class="glyph" aria-hidden="true">II</span>
+          <div>
+            <h3>Generative Music &amp; Audio Editing</h3>
+            <p>Models that generate, transform, and reinterpret music while preserving controllable aspects of musical content, style, and production.</p>
+          </div>
+        </div>
+        <div class="area">
+          <span class="glyph" aria-hidden="true">III</span>
+          <div>
+            <h3>Cognitive Science</h3>
+            <p>Computational and experimental perspectives on human memory, attention, perception, and learning — and how these mechanisms shape interaction with intelligent systems.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-      <section class="content-grid" id="contentGrid">
-        <article id="about" class="panel reveal">
-          <h2>About</h2>
-          <p>
-            I build AI-native software systems with a focus on practical multi-agent
-            workflows, developer tools, and human-AI interaction design.
-          </p>
-        </article>
+  <!-- CONTACT -->
+  <section class="section" id="contact">
+    <div class="panel reveal">
+      <p class="section-kicker">Section IV</p>
+      <h2>Contact</h2>
+      <hr class="rule" />
+      <p>
+        I’m always happy to meet fellow students and people who share my interests
+        in music, AI, and cognitive science. Feel free to reach out to exchange ideas,
+        learn together, or collaborate on a project.
+      </p>
+      <ul class="contact-rows">
+        <li><span class="label">Email</span><a href="mailto:roytsai0822@gmail.com">roytsai0822@gmail.com</a></li>
+        <li><span class="label">GitHub</span><a href="https://github.com/Roy0822">github.com/Roy0822</a></li>
+      </ul>
+    </div>
+  </section>
 
-        <article id="education" class="panel reveal">
-          <h2>Education</h2>
-          <p>
-            M.S. in Computer Science. Core interests: autonomous systems, language
-            models, software engineering, and interactive intelligence.
-          </p>
-        </article>
+</div>
+</main>
 
-        <article id="publications" class="panel reveal">
-          <h2>Publications</h2>
-          <p>
-            Selected publications and manuscripts in AI systems, agent collaboration,
-            and code-generation workflows.
-          </p>
-        </article>
+<footer>
+  <span class="fleuron" aria-hidden="true">❧</span>
+  © 2026 Roy Tsai · Hand-planted with HTML, CSS &amp; a little WebGL
+  <details class="garden-credits"><summary>Garden credits</summary>
+    <p>The Thinker — Auguste Rodin. 3D scan: <a href="https://commons.wikimedia.org/wiki/File:Scan_the_World_-_The_Thinker_(Auguste_Rodin).stl">Scan the World</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. Mesh simplified; bronze finish added. <a href="assets/models/the-thinker/the-thinker.glb" download>Adapted model</a>.<br />
+    Surface textures: <a href="https://polyhaven.com/">Poly Haven</a> (CC0) and <a href="https://threejs.org/">Three.js</a>.</p>
+  </details>
+</footer>
 
-        <article id="projects" class="panel reveal">
-          <h2>Projects</h2>
-          <p>
-            Portfolio includes AI coding assistants, web interaction experiments,
-            and open-source research prototypes.
-          </p>
-        </article>
-
-        <article id="contact" class="panel reveal">
-          <h2>Contact</h2>
-          <p>
-            Email: roy@example.com<br />
-            GitHub: github.com/roy0822
-          </p>
-        </article>
-      </section>
-    </main>
-
-    <footer>
-      <small>© <span id="year"></span> Roy0822</small>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.min.js"></script>
-    <script src="script.js"></script>
-  </body>
+<script defer src="assets/vendor/three.min.js"></script>
+<script defer src="assets/vendor/GLTFLoader.js"></script>
+<script defer src="assets/vendor/OrbitControls.js"></script>
+<script defer src="garden.js"></script>
+</body>
 </html>
